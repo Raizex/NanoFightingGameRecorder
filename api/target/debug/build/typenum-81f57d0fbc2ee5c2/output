@@ -1,0 +1,2 @@
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/home/tanner/Desktop/NanoFightingGameRecorder/api/target/debug/build/typenum-81f57d0fbc2ee5c2/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/home/tanner/Desktop/NanoFightingGameRecorder/api/target/debug/build/typenum-81f57d0fbc2ee5c2/out/op.rs
