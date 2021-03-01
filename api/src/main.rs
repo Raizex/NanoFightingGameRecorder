@@ -3,28 +3,38 @@ mod config;
 
 use crate::models::Status;
 use crate::models::Host;
-use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
-//use std::io;
+use actix_web::{web, App, HttpServer, Responder, HttpResponse};
+use std::sync::Mutex;
+use std::sync::Arc;
 use rand::Rng;
 use dotenv::dotenv;
-
-#[get("/hello")]
-async fn hello() -> impl Responder{
-    HttpResponse::Ok().body("Hello World")
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder{
-    HttpResponse::Ok().body(req_body)
-}
 
 async fn index() -> impl Responder{
     HttpResponse::Ok()
         .json(Status{status: "UP".to_string()})
 }
 
-async fn pair(state: Host) -> impl Responder{
-    HttpResponse::Ok().body("Device paired")
+async fn pair(state: web::Data<Arc<Mutex<Host>>>) -> impl Responder{
+    let mut state = state.lock().unwrap();
+    if state.is_paired == false{
+        state.is_paired = true;
+        state.pair_key = generate();
+        HttpResponse::Ok().body(format!("pair_key: {}", state.pair_key))
+    }else {
+        HttpResponse::Ok().body("Access Denied!")
+    }
+}
+
+async fn unpair() -> impl Responder{
+    HttpResponse::Ok().body("Access Denied!")
+}
+
+async fn start() -> impl Responder{
+    HttpResponse::Ok().body("Access Denied!")
+}
+
+async fn stop() -> impl Responder{
+    HttpResponse::Ok().body("Access Denied!")
 }
 
 async fn admin() -> impl Responder{
@@ -41,21 +51,19 @@ async fn main() -> std::io::Result<()>{
     //Create a current_state object that is instantiated from the Host struct
     //This current_state object will hold an 'is_paired' boolean and a pair_key
     let key = generate();
-    let current_state = Host::new(false, key);
+    let state = Arc::new(Mutex::new(Host{is_paired: false, pair_key: key}));
 
     println!("Starting Server at http://{}:{}/", config.server.host, config.server.port);
 
     HttpServer::new(move || {
         App::new()
             //Default Routes
-            .service(hello)
-            .service(echo)
             .route("/", web::get().to(index))
             //Configure routes
             .service(
                 web::scope("/nano")
                     //Guest endpoint (Pair Command)
-                    .data(current_state.copy())
+                    .data(state.clone())
                     .service(web::resource("/pair").route(web::get().to(pair)))
                     //Admin Scope
                     .service(
