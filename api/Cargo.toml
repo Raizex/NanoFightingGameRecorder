@@ -12,3 +12,4 @@ actix-rt = "1.0"
 serde = { version="1.0.104", features=["derive"] }
 dotenv = "0.15.0"
 config = "0.10.1"
+rand = "0.8.0"
