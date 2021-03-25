@@ -5,7 +5,7 @@ pub struct Status {
     pub status: String
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Host{
     pub is_paired: bool,
     pub pair_key: String,
