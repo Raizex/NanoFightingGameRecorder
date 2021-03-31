@@ -11,3 +11,8 @@ pub struct Host{
     pub pair_key: String,
     pub is_recording: bool,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct Client{
+    pub key: String
+}

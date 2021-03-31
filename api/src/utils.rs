@@ -1,4 +1,5 @@
 use rand::Rng;
+use std::vec::Vec;
 
 //Function generates a unique key
 pub fn generate() -> String{
@@ -17,4 +18,30 @@ pub fn generate() -> String{
         .collect();
 
     return password;
+}
+
+pub fn convert_time(time: i64) -> Vec<i64>{
+
+    let mut minutes = 0;
+    let mut seconds = 0;
+    let mut time_list: Vec<i64> = Vec::new();
+
+    //Convert time to seconds (time should be in miliseconds)
+    let time = time / 1000;
+
+    //Check if time is less than a minute
+    //If so, just update the seconds variable
+    //If not, update minutes and seconds
+    if time <= 60 {
+       seconds = time;
+    }else{
+        minutes = time / 60;
+        seconds = time % 60;
+    }
+
+    //Append minutes and seconds to the list
+    time_list.push(minutes);
+    time_list.push(seconds);
+
+    return time_list
 }
