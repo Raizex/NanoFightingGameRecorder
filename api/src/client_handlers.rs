@@ -7,13 +7,21 @@ use stopwatch::{Stopwatch};
 use std::sync::Mutex;
 use std::sync::Arc;
 
+// Client Handlers 
+// Parameters: 
+// state - This is the host object that holds the overall status of the host device (pair_key, is_recording, is_paired) 
+// sw - This is the stopwatch object that records the video time.
+// info - This is the json body that the POST requests have included
+
+
 // Test get request handler which gives status of web server
 pub async fn index() -> impl Responder{
     HttpResponse::Ok()
         .json(Status{status: "UP".to_string()})
 }
 
-//Pair to api 
+
+//GET /nano/pair
 pub async fn pair(state: web::Data<Arc<Mutex<Host>>>) -> impl Responder{
     let mut state = state.lock().unwrap();
     if state.is_paired == false{
@@ -25,13 +33,7 @@ pub async fn pair(state: web::Data<Arc<Mutex<Host>>>) -> impl Responder{
     }
 }
 
-//Return client pair_key
-pub async fn getkey(state: web::Data<Arc<Mutex<Host>>>) -> impl Responder{
-    let state = state.lock().unwrap();
-    HttpResponse::Ok().body(format!("{}", state.pair_key))
-}
-
-//Unpair client device with api
+// POST /nano/unpair ContentType: applications/json {"key":"{pairkey}"}
 pub async fn unpair(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
@@ -47,19 +49,8 @@ pub async fn unpair(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<
     }
 }
 
-pub async fn test(state: web::Data<Arc<Mutex<Host>>>, info: web::Json<Client>) -> impl Responder {
-    let mut state = state.lock().unwrap();
 
-
-    if info.key == state.pair_key{
-        HttpResponse::Ok().body(format!("{}", info.key))
-    }else{
-        HttpResponse::Ok().body("fail")
-    }
-    
-}
-
-//Start recording request handler
+//// POST /nano/start ContentType: applications/json {"key":"{pairkey}"}
 pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
@@ -76,7 +67,7 @@ pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<S
     }
 }
 
-//Stop recording request handler
+// POST /nano/stop ContentType: applications/json {"key":"{pairkey}"}
 pub async fn stop(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();

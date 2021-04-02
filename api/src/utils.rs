@@ -20,6 +20,7 @@ pub fn generate() -> String{
     return password;
 }
 
+// Function converts time (in ms) to a Vector with minutes and seconds
 pub fn convert_time(time: i64) -> Vec<i64>{
 
     let mut minutes = 0;
