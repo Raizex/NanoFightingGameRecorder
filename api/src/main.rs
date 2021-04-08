@@ -56,7 +56,6 @@ async fn main() -> std::io::Result<()>{
             )
     
     })
-    .bind(format!("{}:{}", config.server.host, config.server.port))?
     .bind_openssl(format!("{}:{}",config.server.host, config.server.port), builder)?
     .run()
     .await
