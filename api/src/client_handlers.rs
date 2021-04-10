@@ -2,6 +2,8 @@ use crate::utils;
 use crate::models::Status;
 use crate::models::Host;
 use crate::models::Client;
+use crate::models::Response;
+use crate::models::ResponseWithTime;
 use actix_web::{web, Responder, HttpResponse};
 use stopwatch::{Stopwatch};
 use std::sync::Mutex;
@@ -27,9 +29,9 @@ pub async fn pair(state: web::Data<Arc<Mutex<Host>>>) -> impl Responder{
     if state.is_paired == false{
         state.is_paired = true;
         state.pair_key = utils::generate();
-        HttpResponse::Ok().body(format!("{}", state.pair_key))
+        HttpResponse::Ok().json(Response{msg: state.pair_key.to_string()})
     }else {
-        HttpResponse::Ok().body("Access Denied")
+        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -43,9 +45,9 @@ pub async fn unpair(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<
         state.pair_key = "".to_string();
         state.is_paired = false;
         sw.reset();
-        HttpResponse::Ok().body("Disconnected from Jetson Nano")
+        HttpResponse::Ok().json(Response{msg: "Disconnected".to_string()})
     }else{
-        HttpResponse::Ok().body("Access Denied")
+        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -59,11 +61,11 @@ pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<S
         state.is_recording = true;
         sw.reset();
         sw.start();
-        HttpResponse::Ok().body("Access Granted. Recording Has Started")
+        HttpResponse::Ok().json(Response{msg: "Success".to_string()})
     }else if state.pair_key == info.key && state.is_recording == true && state.is_paired == true{
-        HttpResponse::Ok().body("Access Granted. Recording is already in progress!")
+        HttpResponse::Ok().json(Response{msg: "Recording Already Started".to_string()})
     }else{
-        HttpResponse::Ok().body("Access Denied")
+        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -72,17 +74,17 @@ pub async fn stop(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<St
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
 
-    if state.pair_key == info.key && state.is_recording == false && state.is_paired == true{
+    if state.pair_key == info.key && state.is_recording == true && state.is_paired == true{
+        state.is_recording = false;
+        sw.stop();
         //Create a time_list vector that recieves the converted time in minutes and seconds
         //The first element in the list are the minutes and the second element are your seconds
         let time_list: Vec<i64> = utils::convert_time(sw.elapsed_ms());
-        HttpResponse::Ok().body(format!("Access Granted. Recording has not yet started. Time Elapsed: {}:{}", time_list[0], time_list[1]))
-    }else if state.pair_key == info.key && state.is_recording == true && state.is_paired == true{
-        state.is_recording = false;
-        sw.stop();
+        HttpResponse::Ok().json(ResponseWithTime{msg: "Success".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
+    }else if state.pair_key == info.key && state.is_recording == false && state.is_paired == true{
         let time_list: Vec<i64> = utils::convert_time(sw.elapsed_ms());
-        HttpResponse::Ok().body(format!("Access Granted. Recording has stopped. Time Elapsed: {}:{}", time_list[0], time_list[1]))
+        HttpResponse::Ok().json(ResponseWithTime{msg: "Recording Already Stopped".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
     }else{
-        HttpResponse::Ok().body("Access Denied")
+        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
     }
 }

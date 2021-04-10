@@ -21,6 +21,7 @@ pub fn generate() -> String{
 }
 
 // Function converts time (in ms) to a Vector with minutes and seconds
+#[allow(unused_assignments)]
 pub fn convert_time(time: i64) -> Vec<i64>{
 
     let mut minutes = 0;

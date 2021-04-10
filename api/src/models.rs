@@ -13,6 +13,17 @@ pub struct Host{
 }
 
 #[derive(Deserialize, Serialize)]
+pub struct Response{
+    pub msg: String
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct ResponseWithTime{
+    pub msg: String,
+    pub time: String
+}
+
+#[derive(Deserialize, Serialize)]
 pub struct Client{
     pub key: String
 }
