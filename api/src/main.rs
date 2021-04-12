@@ -1,3 +1,6 @@
+#[cfg(test)]
+#[path = "tests/testcases.rs"]
+mod testcases;
 mod models;
 mod config;
 mod utils;
@@ -35,7 +38,7 @@ async fn main() -> std::io::Result<()>{
     //This current_state object will hold an 'is_paired' boolean and a pair_key
     let state = Arc::new(Mutex::new(Host{is_paired: false, pair_key: "".to_string(), is_recording: false}));
 
-    println!("Starting Server at http://{}:{}/", config.server.host, config.server.port);
+    println!("Starting Server at https://{}:{}/", config.server.host, config.server.port);
 
     HttpServer::new(move || {
         App::new()
@@ -44,9 +47,10 @@ async fn main() -> std::io::Result<()>{
             //Configure routes
             .service(
                 web::scope("/nano")
-                    //Guest endpoint (Pair Command)
+                    //Data that will be private to the api routes
                     .data(state.clone())
                     .data(sw.clone())
+                    //Guest endpoint (Pair Command)
                     .service(web::resource("/pair").route(web::get().to(client_handlers::pair)))
                     //start, stop, and unpair protected routes (client)
                     .service(web::resource("/start").route(web::post().to(client_handlers::start)))

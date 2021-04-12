@@ -31,7 +31,7 @@ pub async fn pair(state: web::Data<Arc<Mutex<Host>>>) -> impl Responder{
         state.pair_key = utils::generate();
         HttpResponse::Ok().json(Response{msg: state.pair_key.to_string()})
     }else {
-        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
+        HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -47,7 +47,7 @@ pub async fn unpair(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<
         sw.reset();
         HttpResponse::Ok().json(Response{msg: "Disconnected".to_string()})
     }else{
-        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
+        HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -63,9 +63,9 @@ pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<S
         sw.start();
         HttpResponse::Ok().json(Response{msg: "Success".to_string()})
     }else if state.pair_key == info.key && state.is_recording == true && state.is_paired == true{
-        HttpResponse::Ok().json(Response{msg: "Recording Already Started".to_string()})
+        HttpResponse::AlreadyReported().json(Response{msg: "Recording Already Started".to_string()})
     }else{
-        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
+        HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -83,8 +83,8 @@ pub async fn stop(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<St
         HttpResponse::Ok().json(ResponseWithTime{msg: "Success".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
     }else if state.pair_key == info.key && state.is_recording == false && state.is_paired == true{
         let time_list: Vec<i64> = utils::convert_time(sw.elapsed_ms());
-        HttpResponse::Ok().json(ResponseWithTime{msg: "Recording Already Stopped".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
+        HttpResponse::AlreadyReported().json(ResponseWithTime{msg: "Recording Already Stopped".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
     }else{
-        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
+        HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
 }
