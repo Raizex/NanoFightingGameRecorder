@@ -4,7 +4,7 @@ use crate::models::Host;
 use crate::models::Client;
 use crate::models::Response;
 use crate::models::ResponseWithTime;
-use actix_web::{web, Responder, HttpResponse};
+use actix_web::{web, Responder, HttpResponse, HttpRequest};
 use stopwatch::{Stopwatch};
 use std::sync::Mutex;
 use std::sync::Arc;
@@ -17,7 +17,7 @@ use std::sync::Arc;
 
 
 // Test get request handler which gives status of web server
-pub async fn index() -> impl Responder{
+pub async fn index(_req: HttpRequest) -> impl Responder{
     HttpResponse::Ok()
         .json(Status{status: "UP".to_string()})
 }

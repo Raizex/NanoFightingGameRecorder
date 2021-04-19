@@ -4,12 +4,16 @@ Test Case 1:
  3. Client is able to stop recording
  4. Client is able to unpair
 
-Test Case 2 (No Pair):
+Test Case 2 (Start with no pair - Multiple run throughs):
  1. Client is not able to start recording
- 2. Client is not able to stop recording
- 3. Client is not able to unpair
 
-Test Case 3 (Redundancy):
+Test Case 3 (Stop without pair - Multiple run throughs):
+ 1. Client is not able to stop a recording
+
+Test case 4 (Unpair without being paired - Multiple run throughs):
+ 1. Client is not able to unpair without pairing first
+
+Test Case 5 (Redundancy):
  1. Client is able to pair
  2. Client is able to start recording
  3. Client is not able to start recording again (Recording is already in progress)
@@ -18,7 +22,7 @@ Test Case 3 (Redundancy):
  6. Client is able to unpair
  7. Client is not able to unpair again
 
-Test Case 4 (Third Party Tamperment):
+Test Case 6 (Third Party Tamperment):
  1. Client is able to pair
  2. Client is not able to pair again (Covers third party as well)
  3. Client is able to start recording

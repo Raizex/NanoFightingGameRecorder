@@ -1,6 +1,6 @@
 #[cfg(test)]
-#[path = "tests/testcases.rs"]
-mod testcases;
+#[path = "tests/tests.rs"]
+mod tests;
 mod models;
 mod config;
 mod utils;
