@@ -1,4 +1,4 @@
-package client.application.ui.dashboard;
+package client.application.ui.connect;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import client.application.R;
 
-public class DashboardFragment extends Fragment {
+public class ConnectFragment extends Fragment {
 
-    private DashboardViewModel dashboardViewModel;
+    private ConnectViewModel connectViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        final TextView textView = root.findViewById(R.id.text_dashboard);
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        connectViewModel =
+                new ViewModelProvider(this).get(ConnectViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_connect, container, false);
+        final TextView textView = root.findViewById(R.id.text_connect);
+        connectViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

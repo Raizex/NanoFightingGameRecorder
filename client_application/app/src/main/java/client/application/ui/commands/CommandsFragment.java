@@ -1,4 +1,4 @@
-package client.application.ui.notifications;
+package client.application.ui.commands;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import client.application.R;
 
-public class NotificationsFragment extends Fragment {
+public class CommandsFragment extends Fragment {
 
-    private NotificationsViewModel notificationsViewModel;
+    private CommandsViewModel commandsViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        notificationsViewModel =
-                new ViewModelProvider(this).get(NotificationsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_notifications, container, false);
-        final TextView textView = root.findViewById(R.id.text_notifications);
-        notificationsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        commandsViewModel =
+                new ViewModelProvider(this).get(CommandsViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_commands, container, false);
+        final TextView textView = root.findViewById(R.id.text_commands);
+        commandsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
