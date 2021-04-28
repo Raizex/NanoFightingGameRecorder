@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">client_application</string>
-    <string name="title_connect">Connect</string>
-    <string name="title_commands">Commands</string>
-    <string name="title_admins">Admins</string>
-</resources>
