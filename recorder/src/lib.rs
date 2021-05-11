@@ -2,7 +2,7 @@ pub mod recorder {
     use std::time::Duration;
     use gst::{State, Pipeline, prelude::*};
     use std::thread;
-    use std::sync::{Arc, RwLock};
+    use std::sync::{Arc, RwLock, mpsc};
 
     #[derive(Debug, PartialEq)]
     pub struct RecorderState {
@@ -75,7 +75,13 @@ pub mod recorder {
                                 state_ref.write().expect("Unable to obtain write lock on state").state = Some(state_changed.get_current());
                             }
                         },
-                        MessageView::Eos(..) => break,
+                        MessageView::Eos(..) => {
+                            pipeline_ref
+                                .write()
+                                .expect("Observer failed to obtain write lock on pipeline.")
+                                .set_state(gst::State::Ready)
+                                .expect("Observer failed to set pipeline to ready state.");
+                        },
                         _ => (),
                     }
                 }
@@ -93,12 +99,16 @@ pub mod recorder {
             Arc::clone(&self.state)
         }
 
-        pub fn play(&mut self) {
+        pub fn record(&mut self) {
             self.pipeline
                 .write()
                 .expect("Failed to obtain write lock on pipeline.")
                 .set_state(gst::State::Playing)
                 .expect("Unable to set the pipeline to the `Playing` state");
+        }
+
+        pub fn stop(&mut self) {
+            self.source.send_event(gst::event::Eos::new());
         }
     }
 }
@@ -122,12 +132,20 @@ mod tests {
     }
 
     #[test]
-    fn test_recorder_play() {
+    fn test_recorder_record_and_stop() {
         let mut recorder = Recorder::new();
-        recorder.play();
+        recorder.record();
         thread::sleep(time::Duration::from_millis(1000));
-        let state_ref = recorder.get_state();
-        assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Playing), file: None, duration: None});
-    }
+        {
+            let state_ref = recorder.get_state();
+            assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Playing), file: None, duration: None});
+        }
 
+        recorder.stop();
+        thread::sleep(time::Duration::from_millis(1000));
+        {
+            let state_ref = recorder.get_state();
+            assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Playing), file: None, duration: None});
+        }
+    }
 }
