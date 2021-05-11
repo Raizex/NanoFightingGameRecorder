@@ -26,6 +26,7 @@ pub mod recorder {
         state: Arc<RwLock<RecorderState>>,
         pipeline: Arc<RwLock<Pipeline>>,
         observer: thread::JoinHandle<()>,
+        source: gst::Element,
     }
 
     impl Recorder {
@@ -84,6 +85,7 @@ pub mod recorder {
                 state:  state,
                 pipeline: pipeline,
                 observer: observer,
+                source: source,
             }
         }
 
@@ -104,7 +106,7 @@ pub mod recorder {
 #[cfg(test)]
 mod tests {
     use crate::recorder::{RecorderState, Recorder};
-    use std::thread;
+    use std::{thread, time};
 
     #[test]
     fn test_new_recorder_state() {
@@ -123,7 +125,7 @@ mod tests {
     fn test_recorder_play() {
         let mut recorder = Recorder::new();
         recorder.play();
-        thread::sleep_ms(2000);
+        thread::sleep(time::Duration::from_millis(1000));
         let state_ref = recorder.get_state();
         assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Playing), file: None, duration: None});
     }
