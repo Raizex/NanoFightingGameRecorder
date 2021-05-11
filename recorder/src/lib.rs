@@ -48,6 +48,7 @@ pub mod recorder {
             let bus = pipeline.get_bus().unwrap();
 
             let state = Arc::new(RwLock::new(RecorderState::new()));
+            let state_ref = Arc::clone(&state);
             let pipeline = Arc::new(RwLock::new(pipeline));
             let pipeline_ref = Arc::clone(&pipeline);
             let observer = thread::spawn(move || {
@@ -70,6 +71,7 @@ pub mod recorder {
                                     state_changed.get_old(),
                                     state_changed.get_current()
                                 );
+                                state_ref.write().expect("Unable to obtain write lock on state").state = Some(state_changed.get_current());
                             }
                         },
                         MessageView::Eos(..) => break,
@@ -102,6 +104,7 @@ pub mod recorder {
 #[cfg(test)]
 mod tests {
     use crate::recorder::{RecorderState, Recorder};
+    use std::thread;
 
     #[test]
     fn test_new_recorder_state() {
@@ -120,6 +123,7 @@ mod tests {
     fn test_recorder_play() {
         let mut recorder = Recorder::new();
         recorder.play();
+        thread::sleep_ms(2000);
         let state_ref = recorder.get_state();
         assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Playing), file: None, duration: None});
     }
