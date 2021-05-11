@@ -145,7 +145,7 @@ mod tests {
         thread::sleep(time::Duration::from_millis(1000));
         {
             let state_ref = recorder.get_state();
-            assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Playing), file: None, duration: None});
+            assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Ready), file: None, duration: None});
         }
     }
 }
