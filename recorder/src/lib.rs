@@ -36,15 +36,29 @@ pub mod recorder {
             // Build elements
             let source = gst::ElementFactory::make("videotestsrc", Some("source"))
                 .expect("Could not create source element.");
-            let sink = gst::ElementFactory::make("autovideosink", Some("sink")).expect("Could not create sink element.");
+            let encoder = gst::ElementFactory::make("x265enc", Some("encoder"))
+                .expect("Could not create encoder element.");
+            let parser = gst::ElementFactory::make("h265parse", Some("parser"))
+                .expect("Could not create muxer element.");
+            let muxer = gst::ElementFactory::make("mp4mux", Some("muxer"))
+                .expect("Could not create muxer element.");
+            let sink = gst::ElementFactory::make("filesink", Some("sink")).expect("Could not create sink element.");
 
             // Build the pipeline
             let pipeline = gst::Pipeline::new(Some("test-pipeline"));
-            pipeline.add_many(&[&source, &sink]).unwrap();
-            source.link(&sink).expect("Elements could not be linked.");
+            pipeline.add_many(&[&source, &encoder, &parser, &muxer, &sink]).unwrap();
+            source.link(&encoder).expect("Source could not be linked to encoder.");
+            encoder.link(&parser).expect("Encoder could not be linked to parser.");
+            parser.link(&muxer).expect("Parser could not be linked to muxer.");
+            muxer.link(&sink).expect("Muxer could not be linked to sink.");
 
             // Modify the source's properties
-            source.set_property_from_str("pathern", "smpte");
+            let pattern = "smpte";
+            let bitrate = 8000000;
+            let location = "test.mp4";
+            source.set_property("pattern", &pattern);
+            encoder.set_property("bitrate", &bitrate);
+            sink.set_property("location", &location);
 
             let bus = pipeline.get_bus().unwrap();
 
