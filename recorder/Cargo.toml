@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 gst = { package = "gstreamer", version = "0.16.7"}
+serde = { version="1.0.104", features=["derive"] }

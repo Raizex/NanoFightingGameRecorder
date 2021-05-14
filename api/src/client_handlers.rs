@@ -7,6 +7,7 @@ use actix_web::{web, Responder, HttpResponse, HttpRequest};
 use stopwatch::{Stopwatch};
 use std::sync::Mutex;
 use std::sync::Arc;
+use recorder::recorder::Recorder;
 
 // Client Handlers 
 // Parameters: 
@@ -52,12 +53,14 @@ pub async fn unpair(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<
 
 
 //// POST /nano/start ContentType: applications/json {"key":"{pairkey}"}
-pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
+pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>, recorder: web::Data<Arc<Mutex<Recorder>>>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
+    let mut recorder = recorder.lock().unwrap();
     println!("Start button pressed");
 
     if state.pair_key == info.key && state.is_recording == false && state.is_paired == true{
+        recorder.record();
         state.is_recording = true;
         sw.reset();
         sw.start();
@@ -70,12 +73,14 @@ pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<S
 }
 
 // POST /nano/stop ContentType: applications/json {"key":"{pairkey}"}
-pub async fn stop(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
+pub async fn stop(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>, recorder: web::Data<Arc<Mutex<Recorder>>>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
+    let mut recorder = recorder.lock().unwrap();
     println!("Stop button pressed");
 
     if state.pair_key == info.key && state.is_recording == true && state.is_paired == true{
+        recorder.stop();
         state.is_recording = false;
         sw.stop();
         HttpResponse::Ok().json(Response{msg: "Success".to_string()})

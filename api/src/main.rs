@@ -13,6 +13,7 @@ use stopwatch::{Stopwatch};
 use std::sync::Mutex;
 use std::sync::Arc;
 use dotenv::dotenv;
+use recorder::recorder::Recorder;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()>{
@@ -38,6 +39,8 @@ async fn main() -> std::io::Result<()>{
     //This current_state object will hold an 'is_paired' boolean and a pair_key
     let state = Arc::new(Mutex::new(Host{is_paired: false, pair_key: "".to_string(), is_recording: false}));
 
+    let recorder = Arc::new(Mutex::new(Recorder::new()));
+
     println!("Starting Server at https://{}:{}/", config.server.host, config.server.port);
 
     HttpServer::new(move || {
@@ -50,6 +53,7 @@ async fn main() -> std::io::Result<()>{
                     //Data that will be private to the api routes
                     .data(state.clone())
                     .data(sw.clone())
+                    .data(recorder.clone())
                     //Guest endpoint (Pair Command)
                     .service(web::resource("/pair").route(web::get().to(client_handlers::pair)))
                     //start, stop, and unpair protected routes (client)

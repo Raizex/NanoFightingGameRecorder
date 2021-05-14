@@ -3,6 +3,7 @@ pub mod recorder {
     use gst::{State, Pipeline, prelude::*};
     use std::thread;
     use std::sync::{Arc, RwLock};
+    use serde::{Serialize, Deserialize};
 
     #[derive(Debug, PartialEq)]
     pub struct RecorderState {
