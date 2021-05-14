@@ -1,0 +1,32 @@
+Test Case 1:
+ 1. Client is able to pair to api server
+ 2. Client is able to start recording
+ 3. Client is able to stop recording
+ 4. Client is able to unpair
+
+Test Case 2 (Start with no pair - Multiple run throughs):
+ 1. Client is not able to start recording
+
+Test Case 3 (Stop without pair - Multiple run throughs):
+ 1. Client is not able to stop a recording
+
+Test case 4 (Unpair without being paired - Multiple run throughs):
+ 1. Client is not able to unpair without pairing first
+
+Test Case 5 (Redundancy):
+ 1. Client is able to pair
+ 2. Client is able to start recording
+ 3. Client is not able to start recording again (Recording is already in progress)
+ 4. Client is able to stop recording
+ 5. Client is not able to stop an already stopped recording
+ 6. Client is able to unpair
+ 7. Client is not able to unpair again
+
+Test Case 6 (Third Party Tamperment):
+ 1. Client is able to pair
+ 2. Client is not able to pair again (Covers third party as well)
+ 3. Client is able to start recording
+ 4. Third party is not able to stop the recording without having the pair key
+ 5. Client is able to stop recording
+ 6. Third Party is not able to start the recording without the pair key
+ 7. Client is able to unpair

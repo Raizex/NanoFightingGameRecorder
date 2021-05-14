@@ -1,5 +1,5 @@
 # Introduction
-This is a program, in simple terms, allows a client to be able to pair to a raspberry pi and then send commands such as start and stop recording. It is an easy way to start screen recording and you will have the option to just download the client android application for a feasible GUI.
+This program is designed to run on a NVIDIA Jetson Nano. You as a user will be able to send commands such as start and stop recording to the Jetson Nano device. Your Jetson Nano will also need to be connected to a monitor using HDMI in order to screen record.
 
 # Hardware Setup
 TBA
@@ -55,16 +55,18 @@ Here are the steps that you need to take to run the api
 Now, in order to pair, start, and stop recording, we need to use either [curl](https://www.educative.io/edpresso/how-to-perform-a-post-request-using-curl) commands to send requests or we can use this [api testing website](https://reqbin.com/). By clicking on the hyperlinks above, you will be directed to a curl tutorial on how to run request commands, and also an api testing website.
 
 **Available Routes**
-`http://127.0.0.1:7878/nano/pair` GET-Request for pairing device.
+`https://127.0.0.1:7878/nano/pair` GET-Request for pairing device.
 The response will be your pair key.
 Save this key! (Ctrl-C)
 
-`http://127.0.0.1:7878/nano/start` Post Request using JSON content type and your pair key that was given to you
+`https://127.0.0.1:7878/nano/start` Post Request using JSON content type and your pair key that was given to you
 JSON Content Ex.: `{"key": "{pair_key}"}`
 
-`http://127.0.0.1:7878/nano/stop` Post Request with same content as above to stop recording
+`https://127.0.0.1:7878/nano/stop` Post Request with same content as above to stop recording
 
-`http://127.0.0.1:7878/nano/unpair` Post Request with the same JSON content as before, which will cause you to lose your pair_key and disconnect.
+`https://127.0.0.1:7878/nano/unpair` Post Request with the same JSON content as before, which will cause you to lose your pair_key and disconnect.
 
-**This version is still incomplete and we are in the process of constructing an Android Application for the client to make things easier**
+# Android Client Application
+We do have an early in development application that you can run on your android device. Here is the [link](https://github.com/trosnerMSU/NanoFightingGameRecorder_AndroidClientGUI) to the Android project which has an apk file that you can download onto your Android device.
+
 
