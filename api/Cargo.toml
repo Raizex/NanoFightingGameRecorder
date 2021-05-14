@@ -11,7 +11,6 @@ actix-web = {version = "3.2.0", features = ["openssl"]}
 pkg-config = "0.3.19"
 openssl-sys = "0.9"
 openssl = {version = "0.10"}
-actix-identity = "0.3.1"
 actix-rt = "1.0"
 env_logger = "0.8.3"
 serde = { version="1.0.104", features=["derive"] }

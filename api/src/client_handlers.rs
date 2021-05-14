@@ -3,8 +3,7 @@ use crate::models::Status;
 use crate::models::Host;
 use crate::models::Client;
 use crate::models::Response;
-use crate::models::ResponseWithTime;
-use actix_web::{web, Responder, HttpResponse};
+use actix_web::{web, Responder, HttpResponse, HttpRequest};
 use stopwatch::{Stopwatch};
 use std::sync::Mutex;
 use std::sync::Arc;
@@ -17,7 +16,7 @@ use std::sync::Arc;
 
 
 // Test get request handler which gives status of web server
-pub async fn index() -> impl Responder{
+pub async fn index(_req: HttpRequest) -> impl Responder{
     HttpResponse::Ok()
         .json(Status{status: "UP".to_string()})
 }
@@ -31,7 +30,7 @@ pub async fn pair(state: web::Data<Arc<Mutex<Host>>>) -> impl Responder{
         state.pair_key = utils::generate();
         HttpResponse::Ok().json(Response{msg: state.pair_key.to_string()})
     }else {
-        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
+        HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -47,7 +46,7 @@ pub async fn unpair(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<
         sw.reset();
         HttpResponse::Ok().json(Response{msg: "Disconnected".to_string()})
     }else{
-        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
+        HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -56,6 +55,7 @@ pub async fn unpair(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<
 pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
+    println!("Start button pressed");
 
     if state.pair_key == info.key && state.is_recording == false && state.is_paired == true{
         state.is_recording = true;
@@ -63,9 +63,9 @@ pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<S
         sw.start();
         HttpResponse::Ok().json(Response{msg: "Success".to_string()})
     }else if state.pair_key == info.key && state.is_recording == true && state.is_paired == true{
-        HttpResponse::Ok().json(Response{msg: "Recording Already Started".to_string()})
+        HttpResponse::AlreadyReported().json(Response{msg: "Recording Already Started".to_string()})
     }else{
-        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
+        HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
 }
 
@@ -73,18 +73,15 @@ pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<S
 pub async fn stop(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
+    println!("Stop button pressed");
 
     if state.pair_key == info.key && state.is_recording == true && state.is_paired == true{
         state.is_recording = false;
         sw.stop();
-        //Create a time_list vector that recieves the converted time in minutes and seconds
-        //The first element in the list are the minutes and the second element are your seconds
-        let time_list: Vec<i64> = utils::convert_time(sw.elapsed_ms());
-        HttpResponse::Ok().json(ResponseWithTime{msg: "Success".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
+        HttpResponse::Ok().json(Response{msg: "Success".to_string()})
     }else if state.pair_key == info.key && state.is_recording == false && state.is_paired == true{
-        let time_list: Vec<i64> = utils::convert_time(sw.elapsed_ms());
-        HttpResponse::Ok().json(ResponseWithTime{msg: "Recording Already Stopped".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
+        HttpResponse::AlreadyReported().json(Response{msg: "Recording Already Stopped".to_string()})
     }else{
-        HttpResponse::Ok().json(Response{msg: "Error".to_string()})
+        HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
 }
