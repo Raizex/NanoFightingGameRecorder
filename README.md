@@ -66,8 +66,7 @@ JSON Content Ex.: `{"key": "{pair_key}"}`
 
 `https://127.0.0.1:7878/nano/unpair` Post Request with the same JSON content as before, which will cause you to lose your pair_key and disconnect.
 
-**Android Client Application**
+# Android Client Application
 We do have an early in development application that you can run on your android device. Here is the [link](https://github.com/trosnerMSU/NanoFightingGameRecorder_AndroidClientGUI) to the Android project which has an apk file that you can download onto your Android device.
 
-**This version is still incomplete and we are in the process of constructing an Android Application for the client to make things easier**
 
