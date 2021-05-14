@@ -146,14 +146,14 @@ mod tests {
     fn test_recorder_record_and_stop() {
         let mut recorder = Recorder::new();
         recorder.record();
-        thread::sleep(time::Duration::from_millis(1000));
+        thread::sleep(time::Duration::from_millis(2000));
         {
             let state_ref = recorder.get_state();
             assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Playing), file: None, duration: None});
         }
 
         recorder.stop();
-        thread::sleep(time::Duration::from_millis(1000));
+        thread::sleep(time::Duration::from_millis(2000));
         {
             let state_ref = recorder.get_state();
             assert_eq!(*state_ref.read().unwrap(), RecorderState{state: Some(gst::State::Ready), file: None, duration: None});
