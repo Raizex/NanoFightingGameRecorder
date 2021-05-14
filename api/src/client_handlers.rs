@@ -3,7 +3,6 @@ use crate::models::Status;
 use crate::models::Host;
 use crate::models::Client;
 use crate::models::Response;
-use crate::models::ResponseWithTime;
 use actix_web::{web, Responder, HttpResponse, HttpRequest};
 use stopwatch::{Stopwatch};
 use std::sync::Mutex;
@@ -56,6 +55,7 @@ pub async fn unpair(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<
 pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
+    println!("Start button pressed");
 
     if state.pair_key == info.key && state.is_recording == false && state.is_paired == true{
         state.is_recording = true;
@@ -73,17 +73,14 @@ pub async fn start(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<S
 pub async fn stop(state: web::Data<Arc<Mutex<Host>>>, sw: web::Data<Arc<Mutex<Stopwatch>>>, info: web::Json<Client>) -> impl Responder{
     let mut state = state.lock().unwrap();
     let mut sw = sw.lock().unwrap();
+    println!("Stop button pressed");
 
     if state.pair_key == info.key && state.is_recording == true && state.is_paired == true{
         state.is_recording = false;
         sw.stop();
-        //Create a time_list vector that recieves the converted time in minutes and seconds
-        //The first element in the list are the minutes and the second element are your seconds
-        let time_list: Vec<i64> = utils::convert_time(sw.elapsed_ms());
-        HttpResponse::Ok().json(ResponseWithTime{msg: "Success".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
+        HttpResponse::Ok().json(Response{msg: "Success".to_string()})
     }else if state.pair_key == info.key && state.is_recording == false && state.is_paired == true{
-        let time_list: Vec<i64> = utils::convert_time(sw.elapsed_ms());
-        HttpResponse::AlreadyReported().json(ResponseWithTime{msg: "Recording Already Stopped".to_string(), time: format!("{}:{}", time_list[0], time_list[1])})
+        HttpResponse::AlreadyReported().json(Response{msg: "Recording Already Stopped".to_string()})
     }else{
         HttpResponse::Unauthorized().json(Response{msg: "Error".to_string()})
     }
