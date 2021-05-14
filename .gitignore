@@ -1,4 +1,6 @@
 api/target/*
 client_test/*
+api/src/tests/*
+target
 api/cert.pem
 api/key.pem
