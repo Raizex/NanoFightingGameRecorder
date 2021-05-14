@@ -2,7 +2,7 @@ pub mod recorder {
     use std::time::Duration;
     use gst::{State, Pipeline, prelude::*};
     use std::thread;
-    use std::sync::{Arc, RwLock, mpsc};
+    use std::sync::{Arc, RwLock};
 
     #[derive(Debug, PartialEq)]
     pub struct RecorderState {
@@ -42,7 +42,8 @@ pub mod recorder {
                 .expect("Could not create muxer element.");
             let muxer = gst::ElementFactory::make("mp4mux", Some("muxer"))
                 .expect("Could not create muxer element.");
-            let sink = gst::ElementFactory::make("filesink", Some("sink")).expect("Could not create sink element.");
+            let sink = gst::ElementFactory::make("filesink", Some("sink"))
+                .expect("Could not create sink element.");
 
             // Build the pipeline
             let pipeline = gst::Pipeline::new(Some("test-pipeline"));
@@ -53,12 +54,8 @@ pub mod recorder {
             muxer.link(&sink).expect("Muxer could not be linked to sink.");
 
             // Modify the source's properties
-            let pattern = "smpte";
-            let bitrate = 8000000;
             let location = "test.mp4";
-            source.set_property("pattern", &pattern);
-            encoder.set_property("bitrate", &bitrate);
-            sink.set_property("location", &location);
+            sink.set_property("location", &location).expect("Unable to set location property on sink.");
 
             let bus = pipeline.get_bus().unwrap();
 
